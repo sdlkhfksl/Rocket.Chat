@@ -1,12 +1,11 @@
-import type { ComponentProps, FC } from 'react';
-import React from 'react';
+import type { ComponentProps } from 'react';
 
-import { useDownloadFromServiceWorker } from '../../../../../hooks/useDownloadFromServiceWorker';
 import AttachmentDownloadBase from './AttachmentDownloadBase';
+import { useDownloadFromServiceWorker } from '../../../../../hooks/useDownloadFromServiceWorker';
 
 type AttachmentDownloadProps = ComponentProps<typeof AttachmentDownloadBase>;
 
-const AttachmentEncryptedDownload: FC<AttachmentDownloadProps> = ({ title, href, ...props }) => {
+const AttachmentEncryptedDownload = ({ title, href, ...props }: AttachmentDownloadProps) => {
 	const encryptedAnchorProps = useDownloadFromServiceWorker(href, title);
 
 	return <AttachmentDownloadBase {...props} {...encryptedAnchorProps} title={title} href={href} />;

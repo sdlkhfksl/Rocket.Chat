@@ -11,7 +11,7 @@ import { createToken } from './random';
 import { loadMessages } from './room';
 import Triggers from './triggers';
 
-const evaluateChangesAndLoadConfigByFields = async (fn: () => Promise<void>) => {
+export const evaluateChangesAndLoadConfigByFields = async (fn: () => Promise<void>) => {
 	const oldStore = JSON.parse(
 		JSON.stringify({
 			user: store.state.user || {},
@@ -42,7 +42,7 @@ const evaluateChangesAndLoadConfigByFields = async (fn: () => Promise<void>) => 
 	}
 };
 
-const createOrUpdateGuest = async (guest: StoreState['guest']) => {
+export const createOrUpdateGuest = async (guest: StoreState['guest']) => {
 	if (!guest) {
 		return;
 	}
@@ -245,6 +245,27 @@ const api = {
 
 			await createOrUpdateGuest(data);
 		});
+	},
+
+	transferChat: async (department: string) => {
+		const {
+			config: { departments = [] },
+			room,
+		} = store.state;
+
+		const dep = departments.find((dep) => dep._id === department || dep.name === department)?._id || '';
+
+		if (!dep) {
+			throw new Error(
+				'The selected department is invalid. Check departments configuration to ensure the department exists, is enabled and has at least 1 agent',
+			);
+		}
+		if (!room) {
+			throw new Error("Conversation has not been started yet, can't transfer");
+		}
+
+		const { _id: rid } = room;
+		await Livechat.transferChat({ rid, department: dep });
 	},
 
 	setLanguage: async (language: StoreState['iframe']['language']) => {
